@@ -1,35 +1,69 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import Dashboard from "./pages/Dashboard";
+
 import Products from "./pages/Products";
 import ProductForm from "./pages/ProductForm";
+
 import Customers from "./pages/Customers";
-import Sales from "./pages/Sales";
+import CustomerForm from "./pages/CustomerForm";
+
+import Suppliers from "./pages/Suppliers";
+import SupplierForm from "./pages/SupplierForm";
+
+import Purchases from "./pages/Purchases";
+import PurchaseForm from "./pages/PurchaseForm";
+import PurchaseHistory from "./pages/PurchaseHistory";
+import ViewPurchase from "./pages/ViewPurchase";
+
+import SaleForm from "./pages/SaleForm";
+import SalesHistory from "./pages/SalesHistory";
+import ViewSale from "./pages/ViewSale";
+
 import Reports from "./pages/Reports";
+import Invoice from "./pages/Invoice";
 
 function App() {
   return (
-    <div>
-      <Dashboard />
+    <BrowserRouter>
+      <Routes>
 
-      <hr />
+        {/* Dashboard */}
+        <Route path="/" element={<Dashboard />} />
 
-      <Products />
+        {/* Products */}
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/add" element={<ProductForm />} />
 
-      <hr />
+        {/* Customers */}
+        <Route path="/customers" element={<Customers />} />
+        <Route path="/customers/add" element={<CustomerForm />} />
 
-      <ProductForm />
+        {/* Suppliers */}
+        <Route path="/suppliers" element={<Suppliers />} />
+        <Route path="/suppliers/add" element={<SupplierForm />} />
 
-      <hr />
+        {/* Purchases */}
+        <Route path="/purchases" element={<Purchases />} />
+        <Route path="/purchases/add" element={<PurchaseForm />} />
+        <Route path="/purchases/edit/:id" element={<PurchaseForm />} />
+        <Route path="/purchases/view/:id" element={<ViewPurchase />} />
+        <Route path="/purchase-history" element={<PurchaseHistory />} />
 
-      <Customers />
+        {/* Sales */}
+        <Route path="/sales" element={<SalesHistory />} />
+        <Route path="/sales/add" element={<SaleForm />} />
+        <Route path="/sales/edit/:id" element={<SaleForm />} />
+        <Route path="/sales-history" element={<SalesHistory />} />
 
-      <hr />
+        <Route path="/sales/view/:id" element={<ViewSale />} />
 
-      <Sales />
+        {/* Reports */}
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/invoice/:id" element={<Invoice />} />
 
-      <hr />
-
-      <Reports />
-    </div>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

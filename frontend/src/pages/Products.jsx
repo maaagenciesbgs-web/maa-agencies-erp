@@ -1,131 +1,271 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MainLayout from "../layouts/MainLayout";
 
 function Products() {
+  const navigate = useNavigate();
+
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
+  const [excelFile, setExcelFile] = useState(null);
 
-  useEffect(() => {
+  const loadProducts = () => {
     fetch("http://127.0.0.1:8000/products/")
       .then((res) => res.json())
-      .then((data) => setProducts(data))
+      .then((data) => {
+  console.log("Products API:", data);
+  setProducts(data);
+})
       .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    loadProducts();
   }, []);
+
+  const importExcel = async () => {
+    if (!excelFile) {
+      alert("Please select an Excel file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", excelFile);
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/products/import",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        alert("Products imported successfully!");
+        loadProducts();
+        setExcelFile(null);
+      } else {
+        alert("Import failed.");
+      }
+    } catch (err) {
+      console.log(err);
+      alert("Server Error");
+    }
+  };
 
   const filteredProducts = products.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div
-      style={{
-        padding: "30px",
-        background: "#f5f7fb",
-        minHeight: "100vh",
-      }}
-    >
-      <h1
+    <MainLayout>
+      <div
         style={{
-          marginBottom: "20px",
-          color: "#2c3e50",
+          padding: "30px",
+          background: "#f5f7fb",
+          minHeight: "100vh",
+          fontFamily: "Arial, sans-serif",
         }}
       >
-        📦 Products
-      </h1>
-
-      <input
-        type="text"
-        placeholder="Search products..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{
-          padding: "12px",
-          width: "320px",
-          marginBottom: "20px",
-          borderRadius: "8px",
-          border: "1px solid #ccc",
-          outline: "none",
-        }}
-      />
-
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          background: "#fff",
-          borderRadius: "10px",
-          overflow: "hidden",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
-        }}
-      >
-        <thead
+        <div
           style={{
-            background: "#1976d2",
-            color: "#fff",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "25px",
           }}
         >
-          <tr>
-            <th style={{ padding: "15px", textAlign: "left" }}>Name</th>
-            <th style={{ padding: "15px", textAlign: "left" }}>Category</th>
-            <th style={{ padding: "15px", textAlign: "left" }}>Brand</th>
-            <th style={{ padding: "15px", textAlign: "center" }}>Stock</th>
-            <th style={{ padding: "15px", textAlign: "right" }}>
-              Selling Price
-            </th>
-          </tr>
-        </thead>
+          <h1>📦 Products</h1>
 
-        <tbody>
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((item, index) => (
-              <tr
-                key={index}
-                style={{
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <td style={{ padding: "15px" }}>{item.name}</td>
-                <td style={{ padding: "15px" }}>{item.category}</td>
-                <td style={{ padding: "15px" }}>{item.brand}</td>
+          <div
+            style={{
+              background: "#1976d2",
+              color: "white",
+              padding: "10px 20px",
+              borderRadius: "8px",
+              fontWeight: "bold",
+            }}
+          >
+            Total Products: {filteredProducts.length}
+          </div>
+        </div>
 
+        <input
+          type="text"
+          placeholder="🔍 Search Products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            width: "300px",
+            padding: "10px",
+            borderRadius: "8px",
+            marginBottom: "20px",
+          }}
+        />
+
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            marginBottom: "20px",
+          }}
+        >
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={(e) => setExcelFile(e.target.files[0])}
+          />
+
+          <button
+            onClick={importExcel}
+            style={{
+              background: "#2e7d32",
+              color: "white",
+              border: "none",
+              padding: "10px 15px",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            📥 Import Excel
+          </button>
+
+          <button
+            onClick={() => navigate("/products/add")}
+            style={{
+              background: "#1976d2",
+              color: "white",
+              border: "none",
+              padding: "10px 15px",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            ➕ Add Product
+          </button>
+        </div>
+
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            background: "white",
+            boxShadow: "0 2px 10px rgba(0,0,0,.1)",
+          }}
+        >
+          <thead
+            style={{
+              background: "#1976d2",
+              color: "white",
+            }}
+          >
+            <tr>
+              <th style={{ padding: "15px" }}>Name</th>
+              <th>Category</th>
+              <th>Brand</th>
+              <th>Stock</th>
+              <th>Selling Price</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((item) => (
+                <tr key={item.id}>
+                  <td style={{ padding: "15px" }}>{item.name}</td>
+                  <td>{item.category}</td>
+                  <td>{item.brand}</td>
+
+                  <td
+                    style={{
+                      textAlign: "center",
+                      color:
+                        item.stock < 10 ? "#d32f2f" : "#2e7d32",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {item.stock}
+                  </td>
+
+                  <td style={{ textAlign: "center" }}>
+                    ₹{item.selling_price}
+                  </td>
+
+                  <td style={{ textAlign: "center" }}>
+                    <button
+                      onClick={() =>
+                        navigate("/products/add", {
+                          state: { product: item },
+                        })
+                      }
+                      style={{
+                        background: "#1976d2",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 14px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        marginRight: "10px",
+                      }}
+                    >
+                      ✏️ Edit
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        if (
+                          !window.confirm(
+                            `Delete "${item.name}"?`
+                          )
+                        )
+                          return;
+
+                        const response = await fetch(
+                          `http://127.0.0.1:8000/products/${item.id}`,
+                          {
+                            method: "DELETE",
+                          }
+                        );
+
+                        if (response.ok) {
+                          loadProducts();
+                        } else {
+                          alert("Delete failed.");
+                        }
+                      }}
+                      style={{
+                        background: "#d32f2f",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 14px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      🗑 Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
                 <td
+                  colSpan="6"
                   style={{
-                    padding: "15px",
+                    padding: "30px",
                     textAlign: "center",
-                    color: item.stock < 10 ? "red" : "green",
-                    fontWeight: "bold",
                   }}
                 >
-                  {item.stock}
-                </td>
-
-                <td
-                  style={{
-                    padding: "15px",
-                    textAlign: "right",
-                    fontWeight: "bold",
-                  }}
-                >
-                  ₹{item.selling_price}
+                  No Products Found
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td
-                colSpan="5"
-                style={{
-                  padding: "30px",
-                  textAlign: "center",
-                  color: "#888",
-                }}
-              >
-                No products found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </MainLayout>
   );
 }
 

@@ -2,24 +2,24 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 
-function Customers() {
+function Suppliers() {
   const navigate = useNavigate();
 
-  const [customers, setCustomers] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
   const [search, setSearch] = useState("");
 
-  const loadCustomers = () => {
-    fetch("http://127.0.0.1:8000/customers/")
+  const loadSuppliers = () => {
+    fetch("http://127.0.0.1:8000/suppliers/")
       .then((res) => res.json())
-      .then((data) => setCustomers(data))
+      .then((data) => setSuppliers(data))
       .catch((err) => console.log(err));
   };
 
   useEffect(() => {
-    loadCustomers();
+    loadSuppliers();
   }, []);
 
-  const filteredCustomers = customers.filter(
+  const filteredSuppliers = suppliers.filter(
     (item) =>
       item.name.toLowerCase().includes(search.toLowerCase()) ||
       item.mobile.includes(search)
@@ -43,7 +43,7 @@ function Customers() {
             marginBottom: "25px",
           }}
         >
-          <h1>👥 Customers</h1>
+          <h1>🚚 Suppliers</h1>
 
           <div
             style={{
@@ -54,13 +54,13 @@ function Customers() {
               fontWeight: "bold",
             }}
           >
-            Total Customers: {filteredCustomers.length}
+            Total Suppliers: {filteredSuppliers.length}
           </div>
         </div>
 
         <input
           type="text"
-          placeholder="🔍 Search Customer..."
+          placeholder="🔍 Search Supplier..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
@@ -73,7 +73,7 @@ function Customers() {
 
         <div style={{ marginBottom: "20px" }}>
           <button
-            onClick={() => navigate("/customers/add")}
+            onClick={() => navigate("/suppliers/add")}
             style={{
               background: "#1976d2",
               color: "white",
@@ -83,7 +83,7 @@ function Customers() {
               cursor: "pointer",
             }}
           >
-            ➕ Add Customer
+            ➕ Add Supplier
           </button>
         </div>
 
@@ -112,8 +112,8 @@ function Customers() {
           </thead>
 
           <tbody>
-            {filteredCustomers.length > 0 ? (
-              filteredCustomers.map((item) => (
+            {filteredSuppliers.length > 0 ? (
+              filteredSuppliers.map((item) => (
                 <tr key={item.id}>
                   <td style={{ padding: "15px" }}>{item.name}</td>
                   <td>{item.mobile}</td>
@@ -124,8 +124,8 @@ function Customers() {
                   <td style={{ textAlign: "center" }}>
                     <button
                       onClick={() =>
-                        navigate("/customers/add", {
-                          state: { customer: item },
+                        navigate("/suppliers/add", {
+                          state: { supplier: item },
                         })
                       }
                       style={{
@@ -151,15 +151,15 @@ function Customers() {
                           return;
 
                         const response = await fetch(
-                          `http://127.0.0.1:8000/customers/${item.id}`,
+                          `http://127.0.0.1:8000/suppliers/${item.id}`,
                           {
                             method: "DELETE",
                           }
                         );
 
                         if (response.ok) {
-                          alert("Customer Deleted Successfully");
-                          loadCustomers();
+                          alert("Supplier Deleted Successfully");
+                          loadSuppliers();
                         } else {
                           alert("Delete Failed");
                         }
@@ -187,7 +187,7 @@ function Customers() {
                     textAlign: "center",
                   }}
                 >
-                  No Customers Found
+                  No Suppliers Found
                 </td>
               </tr>
             )}
@@ -198,4 +198,4 @@ function Customers() {
   );
 }
 
-export default Customers;
+export default Suppliers;

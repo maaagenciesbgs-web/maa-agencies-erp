@@ -1,4 +1,5 @@
 import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
 
 function MainLayout({ children }) {
   return (
@@ -11,14 +12,25 @@ function MainLayout({ children }) {
     >
       <Sidebar />
 
-      <main
+      <div
         style={{
           flex: 1,
-          padding: "30px",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        {children}
-      </main>
+        <Header />
+
+        <main
+          style={{
+            flex: 1,
+            padding: "30px",
+            overflow: "auto",
+          }}
+        >
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
